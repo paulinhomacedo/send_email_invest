@@ -1,4 +1,3 @@
-import json
 import os
 import smtplib
 from email.mime.application import MIMEApplication
@@ -18,7 +17,7 @@ def send_email(anexos: dict):
     #########################################
     endereco_remetente = os.environ.get('EMAIL')
     remetente_senha = os.environ.get('PASSWORD')
-    enderecos_destinatarios = os.environ.get('EMAIL_GROUP').split()
+    enderecos_destinatarios = os.environ.get('EMAIL_GROUP').split(sep=',')
 
     #########################################
     # REMETENTE / DESTINATARIO / ASSUNTO
