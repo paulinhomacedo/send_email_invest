@@ -11,7 +11,7 @@ load_dotenv()
 
 
 def convert_bytes(size):
-    """Convert bytes to KB, or MB or GB"""
+    """Converter bytes para KB, ou MB ou GB"""
     for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
         if size < 1024.0:
             return '%3.1f %s' % (size, x)
