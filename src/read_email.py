@@ -1,6 +1,7 @@
 import email
 import imaplib
 import os
+from threading import Thread
 
 from dotenv import load_dotenv
 
@@ -83,7 +84,7 @@ def read_email():
                     'Não foi possível pegar email com id {}'.format(msg_id)
                 )
 
-            # anexos = {}
+            anexos = {}
 
             for response_part in msg_data:
                 # print(type(response_part))
@@ -108,14 +109,16 @@ def read_email():
                                     'PASSOU 30 MB',
                                     convert_bytes(CONSUMER_BYTES),
                                 )
-                                # enviarEmails(anexos=anexos)
-                                send_email(anexos=anexos)
+                                task = Thread(target=send_email(anexos=anexos))
+                                task.start()
+
                                 CONSUMER_BYTES = 0
                                 anexos = {}
 
                     print('Enviando Email:.', convert_bytes(CONSUMER_BYTES))
 
-                    send_email(anexos=anexos)
+                    task = Thread(target=send_email(anexos=anexos))
+                    task.start()
     else:
         if VERBOSE:
             print()
