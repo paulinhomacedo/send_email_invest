@@ -25,14 +25,13 @@ def send_email(anexos: dict):
     msg = MIMEMultipart()
     msg['From'] = endereco_remetente
     # msg['To'] = ', '.join(enderecos_destinatarios)
-    msg['Cc'] = ', '.join(enderecos_destinatarios)
+    msg['Cco'] = ', '.join(enderecos_destinatarios)
     msg['Subject'] = '.:Investimentos:.'
     corpo_email = ''
 
     #########################################
     # ANEXOS E-MAIL
-    #########################################
-    print('anexando conteudo')
+    #########################################    
     for name_arquivo, conteudo in anexos.items():
         suffix = Path(name_arquivo).suffix
         name_file = Path(name_arquivo).name
@@ -42,7 +41,6 @@ def send_email(anexos: dict):
             'content-disposition', 'attachment', filename=name_arquivo
         )
         msg.attach(attachedfile)
-    print('FIM anexando conteudo')
     #########################################
     # CORPO E-MAIL
     #########################################
@@ -52,18 +50,12 @@ def send_email(anexos: dict):
     #########################################
     # ABRIR CONEXÃO / ENVIAR / FECHAR CONEXÃO
     #########################################
-    print('abre conexao')
     try:
         smtp = smtplib.SMTP(host='smtp.gmail.com', port=587, timeout=240)
     except BaseException as erro:
-        v_msg = f'Erro de SMTP > {erro}'
-        print(v_msg)
+        v_msg = f'Erro de SMTP > {erro}'        
         raise Exception(v_msg)
-    print('starttls conexao')
     smtp.starttls()
-    print('login')
     smtp.login(endereco_remetente, remetente_senha)
-    print('sendmail')
     smtp.sendmail(endereco_remetente, enderecos_destinatarios, msg.as_string())
     smtp.close()
-    print('email enviado ')

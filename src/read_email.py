@@ -2,6 +2,7 @@ import email
 import imaplib
 import os
 from threading import Thread
+from time import perf_counter
 
 from dotenv import load_dotenv
 
@@ -34,6 +35,8 @@ def read_email():
 
     # Anexos do email
     anexos = {}
+    threads = []
+    start_time = perf_counter()
     #########################################
     # ABRIR CONEXÃO SERVIDOR
     #########################################
@@ -55,9 +58,6 @@ def read_email():
     # LOOP EMAILS
     #########################################
     messages_id_list = data[0].decode('utf-8').split(' ')
-    print('messages_id_list', messages_id_list)
-    print('data', data)
-
     # Fetch each message data
     if messages_id_list[0] != '':
         if VERBOSE:
@@ -72,11 +72,7 @@ def read_email():
         #########################################
         # PEGAR ANEXOS
         #########################################
-        for mensagem in range(len(messages_id_list)):
-            (
-                msg_id,
-                *_,
-            ) = messages_id_list  # messages_id_list[len(messages_sent)]
+        for msg_id in messages_id_list:
             print('desempacotar', msg_id)
             status, msg_data = imap_client.fetch(msg_id, '(RFC822)')
             if status != 'OK':
@@ -109,23 +105,35 @@ def read_email():
                                     'PASSOU 30 MB',
                                     convert_bytes(CONSUMER_BYTES),
                                 )
-                                task = Thread(target=send_email(anexos=anexos))
+                                task = Thread(
+                                    target=send_email, args=(anexos,)
+                                )
+                                print('criou a Thread 30MB')
                                 task.start()
+                                print('FIM a Thread')
 
                                 CONSUMER_BYTES = 0
                                 anexos = {}
 
                     print('Enviando Email:.', convert_bytes(CONSUMER_BYTES))
-
-                    task = Thread(target=send_email(anexos=anexos))
+                    print('criou a Thread')
+                    task = Thread(target=send_email, args=(anexos,))
+                    threads.append(task)
                     task.start()
+            # wait for the threads to complete
+            for t in threads:
+                t.join()
+
+            end_time = perf_counter()
     else:
         if VERBOSE:
             print()
             print('Não foram encontrados emails.')
 
     if VERBOSE:
-        print('Trabalho finalizado. Aproveite seu dia!')
+        print(
+            f'Trabalho finalizado. Aproveite seu dia!/n tempo de execução:{end_time- start_time: 0.2f}'
+        )
         print()
 
     #########################################
