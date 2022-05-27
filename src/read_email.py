@@ -123,12 +123,13 @@ def read_email():
             # wait for the threads to complete
             for t in threads:
                 t.join()
-
-            end_time = perf_counter()
+            
     else:
         if VERBOSE:
             print()
             print('Não foram encontrados emails.')
+
+    end_time = perf_counter()        
 
     if VERBOSE:
         print(
