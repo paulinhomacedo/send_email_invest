@@ -118,7 +118,7 @@ def read_email():
                                 anexos = {}
 
                     print('Enviando Email:.')
-                    print('Criou a Thread Final')
+                    print(f'Criou a Thread Final {convert_bytes(file_size)}')
                     anexos[fileName] = part.get_payload(
                                     decode=True
                                 )
