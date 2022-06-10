@@ -20,7 +20,7 @@ def convert_bytes(size):
 
 
 def read_email():
-    LIMIT_BYTES = 31457280   # 30 MB
+    LIMIT_BYTES = 31457280  # 30 MB
     CONSUMER_BYTES = 0
     #########################################
     # USUARIO E SENHAS
@@ -95,11 +95,12 @@ def read_email():
                         fileName = part.get_filename()
                         if bool(fileName):
                             file_size = len(str(part))
+                            CONSUMER_BYTES += file_size
                             if CONSUMER_BYTES <= LIMIT_BYTES:
                                 anexos[fileName] = part.get_payload(
                                     decode=True
                                 )
-                                CONSUMER_BYTES += file_size
+                                #CONSUMER_BYTES += file_size
                             else:
                                 print(
                                     'PASSOU 30 MB',
@@ -108,15 +109,19 @@ def read_email():
                                 task = Thread(
                                     target=send_email, args=(anexos,)
                                 )
-                                print('criou a Thread 30MB')
+                                threads.append(task)
+                                print(f'criou a Thread {convert_bytes(CONSUMER_BYTES - file_size)}')
                                 task.start()
                                 print('FIM a Thread')
 
                                 CONSUMER_BYTES = 0
                                 anexos = {}
 
-                    print('Enviando Email:.', convert_bytes(CONSUMER_BYTES))
-                    print('criou a Thread')
+                    print('Enviando Email:.')
+                    print('Criou a Thread Final')
+                    anexos[fileName] = part.get_payload(
+                                    decode=True
+                                )
                     task = Thread(target=send_email, args=(anexos,))
                     threads.append(task)
                     task.start()
